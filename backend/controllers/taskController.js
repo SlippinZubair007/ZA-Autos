@@ -9,6 +9,31 @@ exports.getAllCars = async (req, res) => {
   }
 };
 
+exports.createCar = async (req, res) => {
+  try {
+    const pool = await poolPromise;
+const result = await pool.request()
+  .input('model', sql.VarChar, model)
+  .input('price', sql.Decimal(18, 2), price)
+  .input('brand_id', sql.Int, brand_id)
+  .input('year', sql.Int, year)
+  .input('image', sql.VarChar, image) // ✅ Add this
+  .input('mileage', sql.Int, mileage)
+  .input('fuel_type', sql.VarChar, fuel_type)
+  .input('transmission', sql.VarChar, transmission)
+  .input('color', sql.VarChar, color)
+  .query(`
+    INSERT INTO Cars (model, price, brand_id, year, image, mileage, fuel_type, transmission, color)
+    VALUES (@model, @price, @brand_id, @year, @image, @mileage, @fuel_type, @transmission, @color)
+  `);
+
+    return res.status(201).json({ message: "Car inserted successfully", data: result });
+  } catch (err) {
+    console.error("Database error:", err);
+    res.status(500).json({ message: "Internal server error", error: err.message });
+  }
+};
+
 exports.getAllBrands = async (req, res) => {
   try {
     const tasks = await Task.getAllBrands();
@@ -193,7 +218,29 @@ exports.GetFilteredCars=async(req, res) => {
       res.status(500).json({ error: 'Internal Server Error' });
     }
   };
-
+  exports.createCar = async (req, res) => {
+    try {
+      const { model, price, brand_id, year, image, mileage, fuel_type, transmission, color } = req.body;
+  
+      const result = await Task.createCar({
+        model,
+        price,
+        brand_id,
+        year,
+        image,
+        mileage,
+        fuel_type,
+        transmission,
+        color
+      });
+  
+      res.json(result);
+    } catch (error) {
+      console.error('Error in createCar controller:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  };
+  
   exports.ProcessTransaction=async(req, res) => { 
     try {
       const {user_id, car_id,total_amount, payment_method} = req.body;
@@ -241,7 +288,15 @@ exports.GetFilteredCars=async(req, res) => {
     }
   }
 
-  
+  exports.GetCarReviews= async (req, res) => {
+    try {
+      const { car_id } = req.body;
+      const result = await Task.GetCarReviews(car_id);
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  }
  
 
 

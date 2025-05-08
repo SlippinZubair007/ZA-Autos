@@ -18,6 +18,27 @@ router.get('/getAvailableCars', taskController.AvailableCars);
 router.get('/TopRated', taskController.TopRatedCars);
 router.get('/UserWishlist', taskController.UserWishlist);
 
+
+router.post('/add',
+  [
+    body('model').notEmpty().withMessage('Model is required'),
+    body('price').isNumeric().withMessage('Price must be a number'),
+    body('brand_id').isInt().withMessage('Brand ID must be an integer'),
+    body('year').isInt({ min: 1886 }).withMessage('Year must be a valid number after 1886'),
+    // Add any additional validation as needed
+  ],
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      console.log("Validation Errors:", errors.array());
+      return res.status(400).json({ errors: errors.array() });
+    }
+    console.log("Validation Passed, Data:", req.body);
+    next();
+  },
+  taskController.createCar  // 👈 YOU NEED TO IMPLEMENT THIS FUNCTION IN YOUR CONTROLLER
+);
+
 router.post('/Register',
     [
       body('user_fname').notEmpty().withMessage('First Name is required'),
@@ -224,5 +245,21 @@ router.post('/GetFilteredCars',
     taskController.DeleteUserAccount
   )
   
+router.post('/GetRating',
+  [
+    body('car_id').notEmpty().withMessage('Car ID is required'),
+  ],
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      console.log("Validation Errors:", errors.array());
+      return res.status(400).json({ errors: errors.array() });
+    }
+    console.log("Validation Passed, Data:", req.body);
+    next();
+  },
+  taskController.GetCarReviews
+)
+
 module.exports = router;
 

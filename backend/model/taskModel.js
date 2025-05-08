@@ -1,5 +1,6 @@
 const { sql, poolPromise } = require('../config/db');
 
+
 const Task = {
   async getAllCars() {
     const pool = await poolPromise;
@@ -11,6 +12,7 @@ const Task = {
     const result = await pool.request().query('SELECT * FROM CarBrand');
     return result.recordset;
   },
+  
   async getAllFeatures() {
     const pool = await poolPromise;
     const result = await pool.request().query('SELECT * FROM CarFeatures');
@@ -80,7 +82,21 @@ const Task = {
       throw error; 
     }
   }, 
-
+  async createCar({ model, price, brand_id, year, image, mileage, fuel_type, transmission, color }) {
+    const pool = await poolPromise;
+    const result = await pool.request()
+      .input('model', sql.VarChar, model)
+      .input('price', sql.Decimal(18, 2), price)
+      .input('brand_id', sql.Int, brand_id)
+      .input('year', sql.Int, year)
+      .input('image', sql.VarChar, image)
+      .input('mileage', sql.Int, mileage)
+      .input('fuel_type', sql.VarChar, fuel_type)    
+      .input('transmission', sql.VarChar, transmission)
+      .input('color', sql.VarChar, color)
+      .execute('createCar');
+    return { id: result.recordset[0].car_id };
+  },
     async validateUserLogin(email, password_hash) {
     try{
     const pool = await poolPromise;
@@ -247,7 +263,19 @@ async ManageWishlist(user_id, car_id, action)  {
     } catch (err) {
       throw new Error('Error deleting user account: ' + err.message);
     }
+  },
+
+async GetCarReviews(car_id) {
+  try {
+    const pool = await poolPromise;
+    const result = await pool.request()
+      .input('car_id', sql.Int, car_id)
+      .execute('GetCarReviews');
+    return result.recordset;
+  } catch (err) {
+    throw new Error('Error fetching car reviews: ' + err.message);
   }
+}
 };
 
 module.exports = Task;

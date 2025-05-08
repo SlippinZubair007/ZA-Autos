@@ -459,7 +459,7 @@ GROUP BY car_id;
 
 --retrieve workers and their roles
 SELECT worker_id, name, role, salary
-FROM Workers;
+FROMï¿½Workers;
 
 DELETE FROM CarUsers
 WHERE user_id=3
@@ -481,7 +481,48 @@ BEGIN
     ELSE
     BEGIN
         PRINT 'Incorrect email or password.';
-    END
+END
 END;
 
+
+CREATE PROCEDURE createCar
+    @model VARCHAR(255),
+    @price DECIMAL(18,2),
+    @brand_id INT,
+    @year INT,
+    @image VARCHAR(MAX),
+    @mileage INT,
+    @fuel_type VARCHAR(50),
+    @transmission VARCHAR(50),
+    @color VARCHAR(50)
+AS
+BEGIN
+    -- Insert the car
+    INSERT INTO Cars (
+        brand_id, model, year, price, mileage,
+        fuel_type, transmission, body_type,
+        color, available, image, created_at, updated_at
+    )
+    VALUES (
+        @brand_id, @model, @year, @price, @mileage,
+        @fuel_type, @transmission, NULL,
+        @color, '1', @image, GETDATE(), GETDATE()
+    );
+
+    -- Return the new car_id
+    SELECT SCOPE_IDENTITY() AS car_id;
+END;
+
+EXEC createCar
+    @model = 'Corolla Altis',
+    @price = 32000.00,
+    @brand_id = 1,
+    @year = 2022,
+    @image = 'https://th.bing.com/th/id/OIP.u882hypjpPwy4_u7XU5SUAHaEK?cb=iwc1&rs=1&pid=ImgDetMain',
+    @mileage = 12000,
+    @fuel_type = 'Petrol',
+    @transmission = 'Automatic',
+    @color = 'White';
+
+DROP PROCEDURE createCar
 
