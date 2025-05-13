@@ -1,7 +1,7 @@
 import { Box, Button, Container, Heading, Input, useColorModeValue, VStack, Text, FormControl } from "@chakra-ui/react";
 import { useState } from "react";
 import { useUserManager } from "../store/SignUp";
-
+import ImageDisplay from "../components/ui/CollectPage";
 const CreateUser = () => {
   const [newUser, setNewUser] = useState({
     user_fname: "",
@@ -43,13 +43,14 @@ const CreateUser = () => {
   };
 
   return (
-    <Container maxw={"container.sm"}>
+    <ImageDisplay>
+    <Container maxw={"container.sm"} mt="50px">
       <VStack spacing={8}>
-        <Heading as={"h1"} size={"2xl"} textAlign={"center"} mb={8}>
+        <Heading as={"h1"} size={"2xl"} textAlign={"center"} mb={8} fontFamily="'Inter', sans-serif" fontSize="32px" >
           Sign Up
         </Heading>
 
-        <Box w={"full"} bg={useColorModeValue("white", "gray.800")} p={6} rounded={"lg"} shadow={"md"}>
+        <Box w={"full"} bg={useColorModeValue("white", "black")} p={6} rounded={"lg"} shadow={"md"}>
           <VStack spacing={4}>
             <FormControl isRequired>
               <Input
@@ -115,6 +116,7 @@ const CreateUser = () => {
         </Box>
       </VStack>
     </Container>
+    </ImageDisplay>
   );
 };
 

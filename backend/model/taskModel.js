@@ -73,7 +73,7 @@ const Task = {
         .input('address', sql.VarChar, address)
         .input('cnic', sql.VarChar, cnic)
         .input('password_hash', sql.VarChar, password_hash)
-        .execute('RegisterUser');  // Calls the stored procedure
+        .execute('RegisterUser');  
       
       return { success: true, message: 'User registered successfully' };
     }
@@ -82,7 +82,7 @@ const Task = {
       throw error; 
     }
   }, 
-  async createCar({ model, price, brand_id, year, image, mileage, fuel_type, transmission, color }) {
+  async createCar({ model, price, brand_id, year, image, mileage, fuel_type, transmission, color,body_type }) {
     const pool = await poolPromise;
     const result = await pool.request()
       .input('model', sql.VarChar, model)
@@ -94,9 +94,11 @@ const Task = {
       .input('fuel_type', sql.VarChar, fuel_type)    
       .input('transmission', sql.VarChar, transmission)
       .input('color', sql.VarChar, color)
+      .input('body_type', sql.VarChar, body_type)
       .execute('createCar');
     return { id: result.recordset[0].car_id };
   },
+  
     async validateUserLogin(email, password_hash) {
     try{
     const pool = await poolPromise;
@@ -274,6 +276,81 @@ async GetCarReviews(car_id) {
     return result.recordset;
   } catch (err) {
     throw new Error('Error fetching car reviews: ' + err.message);
+  }
+},
+
+async GetUserWishlist(user_id) {
+  try {
+    const pool = await poolPromise;
+    const result = await pool.request()
+      .input('user_id', sql.Int, user_id)
+      .execute('GetUserWishlist');
+    return result.recordset;
+  } catch (err) {
+    throw new Error('Error fetching user reviews: ' + err.message);
+  }
+},
+async addToWishlist(user_id, car_id) {
+  try {
+    const pool = await poolPromise;
+    const result = await pool.request()
+      .input('user_id', sql.Int, user_id)
+      .input('car_id', sql.Int, car_id)
+      .execute('AddToWishlist');
+    return { success: true, message: 'Car added to wishlist successfully' };
+  } catch (err) {
+    throw new Error('Error adding to wishlist: ' + err.message);
+  }
+  },
+  async UpdateUserProfile(user_id,user_fname,user_lname,email,password_hash,address,contact_info) {
+    try {
+      const pool = await poolPromise;
+      const result = await pool.request()
+        .input('user_id', sql.Int, user_id)
+        .input('user_fname', sql.VarChar, user_fname)
+        .input('user_lname', sql.VarChar, user_lname)
+        .input('email', sql.VarChar, email)
+        .input('password_hash', sql.VarChar, password_hash)
+        .input('address', sql.VarChar, address)
+        .input('contact_info', sql.VarChar, contact_info)
+        .execute('UpdateUserProfile');
+      return { success: true, message: 'User profile updated successfully' };
+    } catch (err) {
+      throw new Error('Error updating user profile: ' + err.message);
+    }
+  },
+
+ async GetUserProfile(user_id) {
+  try {
+    const pool = await poolPromise;
+    const result = await pool.request()
+      .input('user_id', sql.Int, user_id)
+      .execute('GetUserProfile');
+    return result.recordset[0]; 
+  } catch (err) {
+    throw new Error('Error fetching user profile: ' + err.message);
+  }
+},
+
+async GetFilteredCarsAdvanced(brand_id, model,min_price,max_price,fuel_type,transmission,min_mileage,max_mileage,body_type,color,year) {
+  try {
+    const pool = await poolPromise;
+    const result = await pool.request()
+      .input('brand_id', sql.Int, brand_id)
+      .input('model', sql.VarChar, model)
+      .input('min_price', sql.Decimal(18, 2), min_price)
+      .input('max_price', sql.Decimal(18, 2), max_price)
+      .input('fuel_type', sql.VarChar, fuel_type)
+      .input('transmission', sql.VarChar, transmission)
+      .input('min_mileage', sql.Int, min_mileage)
+      .input('max_mileage', sql.Int, max_mileage)
+      .input('body_type', sql.VarChar, body_type)
+      .input('color', sql.VarChar, color)
+      .input('year', sql.Int, year)
+      .execute('GetFilteredCarsAdvanced');
+    return result.recordset;
+  } catch (err) {
+    throw new Error('Error filtering cars: ' + err.message);
   }
 }
 };

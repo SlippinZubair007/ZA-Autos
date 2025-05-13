@@ -4,7 +4,7 @@ export const useCarStore = create((set) => ({
   cars: [],
   setCars: (cars) => set({ cars }),
   createCar: async (newCar) => {
-    if (!newCar.model || !newCar.price) {
+    if (!newCar.model || !newCar.price || !newCar.image || !newCar.brand_id || !newCar.year || !newCar.color || !newCar.fuel_type || !newCar.mileage || !newCar.transmission || !newCar.body_type) {
       return { success: false, message: "All fields are required" };
     }
     try {

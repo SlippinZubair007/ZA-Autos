@@ -2,7 +2,6 @@ import React from 'react';
 import { FaMoon } from 'react-icons/fa';
 import { MdOutlineWbSunny } from 'react-icons/md';
 import { Link } from 'react-router-dom';
-
 import {
   Container,
   Flex,
@@ -12,9 +11,10 @@ import {
   useColorMode,
 } from '@chakra-ui/react';
 import {CustomMenu ,ProfileMenu} from '../components/ui/Menu'; 
-import CartIcon from '../components/ui/CartIcon'; // Assuming you have a CartIcon component
+import CartIcon from '../components/ui/CartIcon';
+
 const Navbar = () => {
-    const {colorMode, toggleColorMode} = useColorMode();
+  const {colorMode, toggleColorMode} = useColorMode();
   return (
     <Container maxW="container.xl" p="4" bg="black" color="black" position="relative">
 
@@ -46,14 +46,13 @@ const Navbar = () => {
           </Box>
           </Button>
         
-        
           <Button bg="black" color="white" size="10ptx" variant="outline">
           <ProfileMenu/>
+
           </Button>
           <Button size="sm">
-            <CartIcon />
+          <CartIcon />
           </Button>
-
         
           <Box   
           left="0%"

@@ -1,5 +1,6 @@
-CREATE DATABASE ZAMotors
+﻿CREATE DATABASE ZAMotors
 use ZAMotors
+
 -- Users Table
 CREATE TABLE CarUsers (
     user_id INT IDENTITY(1,1) PRIMARY KEY,
@@ -14,6 +15,7 @@ CREATE TABLE CarUsers (
     created_at DATETIME DEFAULT GETDATE(),
     updated_at DATETIME DEFAULT GETDATE()
 );
+ALTER TABLE Cars ADD image VARCHAR(MAX)
 
 -- Car Brands Table
 CREATE TABLE CarBrand (
@@ -25,21 +27,27 @@ CREATE TABLE CarBrand (
 );
 
 -- Cars Table
-CREATE TABLE Cars (
-    car_id INT IDENTITY(1,1) PRIMARY KEY,
-    brand_id INT FOREIGN KEY REFERENCES CarBrand(brand_id) ON DELETE CASCADE,
-    model VARCHAR(255) NOT NULL,
-    year INT CHECK (year >= 1886),
-    price DECIMAL(18,2) NOT NULL CHECK (price>=0),
-    mileage INT,
-    fuel_type VARCHAR(50),
-    transmission VARCHAR(50),
-    body_type VARCHAR(50),
-    color VARCHAR(50),
-    available VARCHAR(1) DEFAULT 1,
-    created_at DATETIME DEFAULT GETDATE(),
-    updated_at DATETIME DEFAULT GETDATE()
-);
+	CREATE TABLE Cars (
+		car_id INT IDENTITY(1,1) PRIMARY KEY,
+		brand_id INT FOREIGN KEY REFERENCES CarBrand(brand_id) ON DELETE CASCADE,
+		model VARCHAR(255) NOT NULL,
+		year INT CHECK (year >= 1886),
+		price DECIMAL(18,2) NOT NULL CHECK (price>=0),
+		mileage INT,
+		fuel_type VARCHAR(50),
+		transmission VARCHAR(50),
+		body_type VARCHAR(50),
+		color VARCHAR(50),
+		available VARCHAR(1) DEFAULT 1,
+		created_at DATETIME DEFAULT GETDATE(),
+		updated_at DATETIME DEFAULT GETDATE()
+	);
+
+	DROP TABLE Cars
+
+	ALTER TABLE CarUsers
+ADD image VARCHAR(MAX);
+
 
 -- Car Features Table
 CREATE TABLE CarFeatures (
@@ -93,25 +101,7 @@ CREATE TABLE UserPreferences (
     budget_range DECIMAL(18,2)
 );
 
--- Workers Table
-CREATE TABLE Workers (
-    worker_id INT IDENTITY(1,1) PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    role VARCHAR(100) NOT NULL,
-    contact_info VARCHAR(12),
-    email VARCHAR(255) UNIQUE NOT NULL,
-    salary DECIMAL(18,2) CHECK (salary>=0),
-    hired_date DATE,
-    created_at DATETIME DEFAULT GETDATE()
-);
 
--- Search History Table
-CREATE TABLE SearchHistory (
-    search_id INT IDENTITY(1,1) PRIMARY KEY,
-    user_id INT FOREIGN KEY REFERENCES CarUsers(user_id) ON DELETE CASCADE,
-    search_query TEXT NOT NULL,
-    searched_at DATETIME DEFAULT GETDATE()
-);
 
 -- Wishlist Table
 CREATE TABLE Wishlist (
@@ -124,7 +114,7 @@ CREATE TABLE Wishlist (
 INSERT INTO CarUsers (user_fname, user_lname, email, contact_info, dob, address, cnic, password_hash, created_at, updated_at) VALUES ('John', 'Doe', 'john.doe@example.com', '1234567890', '1985-06-15', '123 Main St, City, Country', '12345-6789012-3', 'hashedpassword123', GETDATE(), GETDATE());
 INSERT INTO CarUsers (user_fname, user_lname, email, contact_info, dob, address, cnic, password_hash, created_at, updated_at) VALUES('Jane', 'Smith', 'jane.smith@example.com', '0987654321', '1990-11-20', '456 Elm St, City, Country', '98765-4321098-7', 'hashedpassword456', GETDATE(), GETDATE());
 
-INSERT INTO CarBrand ( brand_name, country, established_year, created_at) VALUES ( 'Toyota', 'Japan', 1937, GETDATE());
+INSERT INTO CarBrand ( brand_name, country, established_year, created_at) VALUES ( 'Mercedes', 'UK', 1947, GETDATE());
 INSERT INTO CarBrand ( brand_name, country, established_year, created_at) VALUES ( 'Ford', 'USA', 1903, GETDATE());
 
 
@@ -137,7 +127,7 @@ VALUES ( 2,'Mclaren', 2021, 35000.00, 5000, 'Petrol', 'Manual', 'Sports', 'Black
 INSERT INTO CarFeatures ( car_id,feature_name, description, created_at) VALUES ( 1,'Sunroof', 'Electric sunroof with tilt and slide function.', GETDATE());
 INSERT INTO CarFeatures ( car_id,feature_name, description, created_at) VALUES (2,'Leather Seats', 'Premium leather upholstery for extra comfort.', GETDATE());
 
-INSERT INTO Reviews ( user_id,car_id,rating, review_text, created_at) VALUES ( 1, 1, 5, 'Excellent car! Comfortable and fuel-efficient.', GETDATE());
+INSERT INTO Reviews ( user_id,car_id,rating, review_text, created_at) VALUES ( 17, 21, 4, 'Big Car', GETDATE());
 INSERT INTO Reviews (  user_id,car_id,rating, review_text, created_at) VALUES ( 2, 2, 4, 'Great performance but a bit expensive.', GETDATE());
 
 INSERT INTO Inquiries ( user_id, car_id, message, response, status, created_at) VALUES ( 1, 1, 'Is there any ongoing discount on this model?', '', 'Pending', GETDATE());
@@ -164,7 +154,7 @@ VALUES ( 2, 'Ford Mustang 2021', GETDATE());
 INSERT INTO Wishlist ( user_id, car_id, added_at) 
 VALUES ( 1, 1, GETDATE());
 INSERT INTO Wishlist ( user_id, car_id, added_at) 
-VALUES ( 2, 2, GETDATE());
+VALUES ( 17, 20, GETDATE());
 
 
 DROP TABLE CarUsers
@@ -175,11 +165,9 @@ DROP TABLE Reviews
 DROP TABLE Inquiries 
 DROP TABLE Transactions
 DROP TABLE UserPreferences
-DROP TABLE Workers
-DROP TABLE SearchHistory
 DROP TABLE Wishlist
---DROP DATABASE ZAMotors
 
+--DROP DATABASE ZAMotors
 SELECT * FROM CarUsers
 SELECT * FROM CarBrand
 SELECT * FROM Cars
@@ -192,9 +180,169 @@ SELECT * FROM Workers
 SELECT * FROM SearchHistory
 SELECT * FROM Wishlist
 
+----------------------------------------------Stored Procedures----------------------------------------------------
+CREATE PROCEDURE createCar
+    @model VARCHAR(255),
+    @price DECIMAL(18,2),
+    @brand_id INT,
+    @year INT,
+    @image VARCHAR(MAX),
+    @mileage INT,
+    @fuel_type VARCHAR(50),
+    @transmission VARCHAR(50),
+    @color VARCHAR(50),
+	@body_type VARCHAR(50)
+AS
+BEGIN
+    -- Insert the car
+    INSERT INTO Cars (
+        brand_id, model, year, price, mileage,
+        fuel_type, transmission, body_type,
+        color, available, image, created_at, updated_at
+    )
+    VALUES (
+        @brand_id, @model, @year, @price, @mileage,
+        @fuel_type, @transmission, @body_type,
+        @color, '1', @image, GETDATE(), GETDATE()
+    );
+
+    SELECT SCOPE_IDENTITY() AS car_id;
+END;
+
+EXEC createCar
+    @model = 'AMG CLS 63',
+    @price = 178300,
+    @brand_id = 1,
+    @year = 2021,
+    @image = 'https://i.ytimg.com/vi/tsfMmTIVoh0/maxresdefault.jpg',
+    @mileage = 0,
+    @fuel_type = 'Petrol',
+    @transmission = 'Automatic',
+    @color = 'Black',
+	@body_type='Muscle';
 
 
-----------------------------------------------HEHE?-----------------NOT HEHE!----------------------------------------------------
+CREATE PROCEDURE GetFilteredCarsAdvanced
+    @brand_id INT = NULL,
+    @model VARCHAR(255) = NULL,
+    @min_price DECIMAL(18,2) = NULL,
+    @max_price DECIMAL(18,2) = NULL,
+    @fuel_type VARCHAR(50) = NULL,
+    @transmission VARCHAR(50) = NULL,
+    @min_mileage INT = NULL,
+    @max_mileage INT = NULL,
+    @body_type VARCHAR(50) = NULL,
+    @color VARCHAR(50) = NULL,
+    @year INT = NULL
+AS
+BEGIN
+    SELECT 
+        c.car_id,
+        cb.brand_name,
+        c.model,
+        c.year,
+        c.price,
+        c.fuel_type,
+        c.transmission,
+        c.mileage,
+        c.body_type,
+        c.color
+    FROM Cars c
+    JOIN CarBrand cb ON c.brand_id = cb.brand_id
+    WHERE 
+        (@brand_id IS NULL OR c.brand_id = @brand_id)
+        AND (@model IS NULL OR c.model LIKE '%' + @model + '%')
+        AND (@min_price IS NULL OR c.price >= @min_price)
+        AND (@max_price IS NULL OR c.price <= @max_price)
+        AND (@fuel_type IS NULL OR c.fuel_type = @fuel_type)
+        AND (@transmission IS NULL OR c.transmission = @transmission)
+        AND (@min_mileage IS NULL OR c.mileage >= @min_mileage)
+        AND (@max_mileage IS NULL OR c.mileage <= @max_mileage)
+        AND (@body_type IS NULL OR c.body_type = @body_type)
+        AND (@color IS NULL OR c.color = @color)
+        AND (@year IS NULL OR c.year = @year)
+        AND (c.available = '1'); 
+END;
+
+
+EXEC GetFilteredCarsAdvanced 
+    @brand_id = 1,
+    @min_price = 15000,
+    @max_price = 30000,
+    @fuel_type = 'Petrol',
+    @transmission = 'Automatic',
+    @min_mileage = 5000,
+    @max_mileage = 20000,
+    @body_type = 'Sedan',
+    @color = 'White',
+    @year = 2022,
+    @model = 'Corolla';
+
+	
+CREATE PROCEDURE GetUserWishlist 
+     @user_id INT 
+AS 
+BEGIN 
+    IF NOT EXISTS (SELECT 1 FROM CarUsers WHERE user_id = @user_id)
+    BEGIN 
+        PRINT 'Error : This user does not exist' 
+        RETURN;
+    END 
+
+
+    SELECT 
+        cu.user_fname,
+        cu.user_lname,
+        c.car_id,
+        c.model,
+        c.year,
+        c.image, 
+        c.color,
+        c.brand_id,
+        c.fuel_type,
+        c.mileage,
+        c.transmission,
+        c.body_type,
+        c.available,
+        c.price
+    FROM 
+        Wishlist w
+    INNER JOIN Cars c ON w.car_id = c.car_id
+    INNER JOIN CarUsers cu ON w.user_id = cu.user_id
+    WHERE 
+        w.user_id = @user_id;
+END;
+
+CREATE PROCEDURE GetCarReviews
+    @car_id INT
+AS
+BEGIN
+   
+    IF NOT EXISTS (SELECT 1 FROM Cars WHERE car_id = @car_id)
+    BEGIN
+        PRINT 'Error: This car does not exist.';
+        RETURN;
+    END
+
+ 
+    SELECT 
+        r.review_id,
+        r.user_id,
+        r.rating,
+        r.review_text,
+        r.created_at,
+        u.user_fname
+    FROM 
+        Reviews r
+    JOIN 
+        CarUsers u ON r.user_id = u.user_id
+    WHERE 
+        r.car_id = @car_id
+    ORDER BY 
+        r.created_at DESC; 
+END;
+
+
 --user registration aka signup
 CREATE PROCEDURE RegisterUser
     @user_fname VARCHAR(255),
@@ -219,9 +367,42 @@ BEGIN
     PRINT 'User registered successfully';
 END;
 
+ALTER PROCEDURE RegisterUser
+    @user_fname VARCHAR(255),
+    @user_lname VARCHAR(255),
+    @email VARCHAR(255),
+    @contact_info VARCHAR(12),
+    @dob DATE,
+    @address VARCHAR(255),
+    @cnic VARCHAR(15),
+    @password_hash VARCHAR(255)
+AS
+BEGIN
+    IF EXISTS (SELECT 1 FROM CarUsers WHERE email = @email)
+    BEGIN
+        RAISERROR('Email already exists.', 16, 1);
+        RETURN;
+    END
+
+    IF EXISTS (SELECT 1 FROM CarUsers WHERE cnic = @cnic)
+    BEGIN
+        RAISERROR('CNIC already exists.', 16, 1);
+        RETURN;
+    END
+
+    INSERT INTO CarUsers (
+        user_fname, user_lname, email, contact_info, dob, address, cnic, password_hash, created_at, updated_at
+    )
+    VALUES (
+        @user_fname, @user_lname, @email, @contact_info, @dob, @address, @cnic, @password_hash, GETDATE(), GETDATE()
+    );
+END;
+
+
 EXEC RegisterUser 'Zubair','Khan','detroitzubairkhan@gmail.com','03044767165','2004-07-14','Iqbal Town','3520201010','ZAuto1'
 EXEC  RegisterUser 'Amna','Rehan','amnarehan@gmail.com','03475875868','2004-12-27','Model Town','3520201011','ZAuto2'
 
+DELETE CarUsers
 SELECT * FROM CarUsers
 
 --login validation
@@ -231,17 +412,25 @@ CREATE PROCEDURE ValidateUserLogin
 AS
 BEGIN
     IF EXISTS (SELECT 1 FROM CarUsers WHERE email = @email AND password_hash = @password_hash)
-	    BEGIN 
-        SELECT 'Login Successful' AS Message;
-		END
+    BEGIN
+        SELECT 
+		    user_id ,
+            1 AS success,
+            'Login Successful' AS message
+        FROM CarUsers
+        WHERE email = @email AND password_hash = @password_hash;
+    END
     ELSE
-	     BEGIN
-        SELECT 'Invalid Credentials' AS Message;
-		END 
-END;
+    BEGIN
+        SELECT 
+            0 AS success,
+            'Invalid Credentials' AS message;
+    END
+END
+
 DROP PROCEDURE ValidateUserLogin
 EXEC ValidateUserLogin 'amnarehan@gmail.com', 'ZAuto2';
-EXEC ValidateUserLogin 'amnarehan@gmail.com', 'ZAuto0';
+EXEC ValidateUserLogin 'amnarehan@gmail.com', 'AmnaUttayHegi';
 
 
 --search history
@@ -339,7 +528,7 @@ DROP PROCEDURE GetFilteredCars
 CREATE PROCEDURE ManageWishlist
     @user_id INT,
     @car_id INT,
-    @action VARCHAR(10) -- 'ADD' or 'REMOVE'
+    @action VARCHAR(10) 
 AS
 BEGIN
     IF @action = 'ADD'
@@ -361,7 +550,7 @@ END;
 EXEC ManageWishList 1,1,'ADD'
 EXEC ManageWishlist 2,2 , 'REMOVE'
 
---update user profile
+
 CREATE PROCEDURE UpdateUserProfile
     @user_id INT,
     @contact_info VARCHAR(12),
@@ -372,7 +561,102 @@ BEGIN
     SET contact_info = @contact_info, address = @address, updated_at = GETDATE()
     WHERE user_id = @user_id;
 END;
-EXEC UpdateUserProfile 2,'0304477165','Iqbal Town'
+
+
+CREATE PROCEDURE addToWishlist
+    @user_id INT,
+    @car_id INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    IF EXISTS (SELECT 1 FROM CarUsers WHERE user_id = @user_id)
+        AND EXISTS (SELECT 1 FROM Cars WHERE car_id = @car_id)
+        AND NOT EXISTS (
+            SELECT 1 FROM Wishlist WHERE user_id = @user_id AND car_id = @car_id
+        )
+    BEGIN
+        INSERT INTO Wishlist (user_id, car_id)
+        VALUES (@user_id, @car_id);
+    END
+END;
+
+DROP PROCEDURE AddToWishlist
+EXEC addToWishlist @User_id = 17, @Car_id = 21;
+SELECT * FROM Wishlist
+
+CREATE PROCEDURE UpdateUserProfile
+    @user_id INT,
+    @user_fname VARCHAR(255),
+    @user_lname VARCHAR(255),
+    @email VARCHAR(255),
+    @password_hash VARCHAR(255),
+    @address VARCHAR(255),
+    @contact_info VARCHAR(12)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    UPDATE CarUsers
+    SET
+        user_fname = @user_fname,
+        user_lname = @user_lname,
+        email = @email,
+        password_hash = @password_hash,
+        address = @address,
+        contact_info = @contact_info,
+        updated_at = GETDATE()
+    WHERE user_id = @user_id;
+END;
+
+CREATE PROCEDURE GetUserProfile
+    @user_id INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT 
+        user_id,
+        user_fname,
+        user_lname,
+        email,
+        contact_info,
+        dob,
+        address,
+        cnic,
+        password_hash,
+        created_at,
+        updated_at 
+    FROM CarUsers
+    WHERE user_id = @user_id;
+END;
+
+
+DROP PROCEDURE UpdateUserProfile
+
+-------------------------------------------------MISC---------------------------------------------------
+--------------------------------------------------------------------------------------------------------
+
+-- Workers Table
+CREATE TABLE Workers (
+    worker_id INT IDENTITY(1,1) PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    role VARCHAR(100) NOT NULL,
+    contact_info VARCHAR(12),
+    email VARCHAR(255) UNIQUE NOT NULL,
+    salary DECIMAL(18,2) CHECK (salary>=0),
+    hired_date DATE,
+    created_at DATETIME DEFAULT GETDATE()
+);
+
+-- Search History Table
+CREATE TABLE SearchHistory (
+    search_id INT IDENTITY(1,1) PRIMARY KEY,
+    user_id INT FOREIGN KEY REFERENCES CarUsers(user_id) ON DELETE CASCADE,
+    search_query TEXT NOT NULL,
+    searched_at DATETIME DEFAULT GETDATE()
+);
+
 --transaction process
 CREATE PROCEDURE ProcessTransaction
     @user_id INT,
@@ -459,11 +743,10 @@ GROUP BY car_id;
 
 --retrieve workers and their roles
 SELECT worker_id, name, role, salary
-FROM�Workers;
+FROM Workers;
 
 DELETE FROM CarUsers
 WHERE user_id=3
-
 
 CREATE PROCEDURE DeleteUserAccount
     @email NVARCHAR(255),
@@ -485,44 +768,175 @@ END
 END;
 
 
-CREATE PROCEDURE createCar
-    @model VARCHAR(255),
-    @price DECIMAL(18,2),
-    @brand_id INT,
-    @year INT,
-    @image VARCHAR(MAX),
-    @mileage INT,
-    @fuel_type VARCHAR(50),
-    @transmission VARCHAR(50),
-    @color VARCHAR(50)
-AS
-BEGIN
-    -- Insert the car
-    INSERT INTO Cars (
-        brand_id, model, year, price, mileage,
-        fuel_type, transmission, body_type,
-        color, available, image, created_at, updated_at
-    )
-    VALUES (
-        @brand_id, @model, @year, @price, @mileage,
-        @fuel_type, @transmission, NULL,
-        @color, '1', @image, GETDATE(), GETDATE()
-    );
 
-    -- Return the new car_id
-    SELECT SCOPE_IDENTITY() AS car_id;
-END;
+-------------------------------------------------Normalized------------------------------------------------
 
-EXEC createCar
-    @model = 'Corolla Altis',
-    @price = 32000.00,
-    @brand_id = 1,
-    @year = 2022,
-    @image = 'https://th.bing.com/th/id/OIP.u882hypjpPwy4_u7XU5SUAHaEK?cb=iwc1&rs=1&pid=ImgDetMain',
-    @mileage = 12000,
-    @fuel_type = 'Petrol',
-    @transmission = 'Automatic',
-    @color = 'White';
+CREATE TABLE CarUsers (
+    user_id INT IDENTITY(1,1) PRIMARY KEY,
+    user_fname VARCHAR(255) NOT NULL,
+    user_lname VARCHAR(255) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    dob DATE,
+    created_at DATETIME DEFAULT GETDATE(),
+    updated_at DATETIME DEFAULT GETDATE()
+);
 
-DROP PROCEDURE createCar
 
+CREATE TABLE UserContactInfo (
+    user_id INT PRIMARY KEY,
+    contact_info VARCHAR(12),
+    address VARCHAR(255),
+    cnic VARCHAR(15) UNIQUE,
+    FOREIGN KEY (user_id) REFERENCES CarUsers(user_id) ON DELETE CASCADE
+);
+
+CREATE TABLE CarBrand (
+    brand_id INT IDENTITY(1,1) PRIMARY KEY,
+    brand_name VARCHAR(255) UNIQUE NOT NULL,
+    country VARCHAR(100),
+    established_year INT,
+    created_at DATETIME DEFAULT GETDATE()
+);
+
+CREATE TABLE FuelTypes (
+    fuel_type_id INT IDENTITY(1,1) PRIMARY KEY,
+    fuel_type VARCHAR(50) UNIQUE NOT NULL
+);
+
+CREATE TABLE TransmissionTypes (
+    transmission_id INT IDENTITY(1,1) PRIMARY KEY,
+    transmission VARCHAR(50) UNIQUE NOT NULL
+);
+
+CREATE TABLE BodyTypes (
+    body_type_id INT IDENTITY(1,1) PRIMARY KEY,
+    body_type VARCHAR(50) UNIQUE NOT NULL
+);
+
+CREATE TABLE Colors (
+    color_id INT IDENTITY(1,1) PRIMARY KEY,
+    color VARCHAR(50) UNIQUE NOT NULL
+);
+
+CREATE TABLE Cars (
+    car_id INT IDENTITY(1,1) PRIMARY KEY,
+    brand_id INT NOT NULL,
+    model VARCHAR(255) NOT NULL,
+    year INT CHECK (year >= 1886),
+    price DECIMAL(18,2) NOT NULL CHECK (price >= 0),
+    mileage INT,
+    fuel_type_id INT,
+    transmission_id INT,
+    body_type_id INT,
+    color_id INT,
+    available BIT DEFAULT 1,
+    created_at DATETIME DEFAULT GETDATE(),
+    updated_at DATETIME DEFAULT GETDATE(),
+    FOREIGN KEY (brand_id) REFERENCES CarBrand(brand_id) ON DELETE CASCADE,
+    FOREIGN KEY (fuel_type_id) REFERENCES FuelTypes(fuel_type_id),
+    FOREIGN KEY (transmission_id) REFERENCES TransmissionTypes(transmission_id),
+    FOREIGN KEY (body_type_id) REFERENCES BodyTypes(body_type_id),
+    FOREIGN KEY (color_id) REFERENCES Colors(color_id)
+);
+
+CREATE TABLE CarImages (
+    image_id INT IDENTITY(1,1) PRIMARY KEY,
+    car_id INT NOT NULL,
+    image_url VARCHAR(MAX),
+    FOREIGN KEY (car_id) REFERENCES Cars(car_id) ON DELETE CASCADE
+);
+
+
+CREATE TABLE Features (
+    feature_id INT IDENTITY(1,1) PRIMARY KEY,
+    feature_name VARCHAR(255) UNIQUE NOT NULL,
+    description TEXT
+);
+
+
+CREATE TABLE CarFeatures (
+    car_id INT,
+    feature_id INT,
+    created_at DATETIME DEFAULT GETDATE(),
+    PRIMARY KEY (car_id, feature_id),
+    FOREIGN KEY (car_id) REFERENCES Cars(car_id) ON DELETE CASCADE,
+    FOREIGN KEY (feature_id) REFERENCES Features(feature_id) ON DELETE CASCADE
+);
+
+CREATE TABLE Reviews (
+    review_id INT IDENTITY(1,1) PRIMARY KEY,
+    user_id INT NOT NULL,
+    car_id INT NOT NULL,
+    rating INT CHECK (rating BETWEEN 1 AND 5),
+    review_text TEXT,
+    created_at DATETIME DEFAULT GETDATE(),
+    FOREIGN KEY (user_id) REFERENCES CarUsers(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (car_id) REFERENCES Cars(car_id) ON DELETE CASCADE
+);
+
+
+CREATE TABLE Inquiries (
+    inquiry_id INT IDENTITY(1,1) PRIMARY KEY,
+    user_id INT NOT NULL,
+    car_id INT NOT NULL,
+    message TEXT NOT NULL,
+    response TEXT,
+    status VARCHAR(50) DEFAULT 'Pending',
+    created_at DATETIME DEFAULT GETDATE(),
+    FOREIGN KEY (user_id) REFERENCES CarUsers(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (car_id) REFERENCES Cars(car_id) ON DELETE CASCADE
+);
+
+
+CREATE TABLE Transactions (
+    transaction_id INT IDENTITY(1,1) PRIMARY KEY,
+    user_id INT NOT NULL,
+    car_id INT NOT NULL,
+    total_amount DECIMAL(18,2) NOT NULL,
+    payment_method VARCHAR(50) NOT NULL,
+    transaction_date DATETIME DEFAULT GETDATE(),
+    status VARCHAR(50) DEFAULT 'Pending',
+    FOREIGN KEY (user_id) REFERENCES CarUsers(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (car_id) REFERENCES Cars(car_id) ON DELETE CASCADE
+);
+
+CREATE TABLE UserPreferences (
+    preference_id INT IDENTITY(1,1) PRIMARY KEY,
+    user_id INT NOT NULL,
+    budget_range DECIMAL(18,2),
+    FOREIGN KEY (user_id) REFERENCES CarUsers(user_id) ON DELETE CASCADE
+);
+
+CREATE TABLE PreferredBrands (
+    preference_id INT,
+    brand_id INT,
+    PRIMARY KEY (preference_id, brand_id),
+    FOREIGN KEY (preference_id) REFERENCES UserPreferences(preference_id) ON DELETE CASCADE,
+    FOREIGN KEY (brand_id) REFERENCES CarBrand(brand_id)
+);
+
+CREATE TABLE PreferredBodyTypes (
+    preference_id INT,
+    body_type_id INT,
+    PRIMARY KEY (preference_id, body_type_id),
+    FOREIGN KEY (preference_id) REFERENCES UserPreferences(preference_id) ON DELETE CASCADE,
+    FOREIGN KEY (body_type_id) REFERENCES BodyTypes(body_type_id)
+);
+
+CREATE TABLE PreferredFuelTypes (
+    preference_id INT,
+    fuel_type_id INT,
+    PRIMARY KEY (preference_id, fuel_type_id),
+    FOREIGN KEY (preference_id) REFERENCES UserPreferences(preference_id) ON DELETE CASCADE,
+    FOREIGN KEY (fuel_type_id) REFERENCES FuelTypes(fuel_type_id)
+);
+
+CREATE TABLE Wishlist (
+    wishlist_id INT IDENTITY(1,1) PRIMARY KEY,
+    user_id INT NOT NULL,
+    car_id INT NOT NULL,
+    added_at DATETIME DEFAULT GETDATE(),
+    FOREIGN KEY (user_id) REFERENCES CarUsers(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (car_id) REFERENCES Cars(car_id) ON DELETE CASCADE
+);

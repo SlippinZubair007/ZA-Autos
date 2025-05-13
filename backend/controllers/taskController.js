@@ -9,30 +9,6 @@ exports.getAllCars = async (req, res) => {
   }
 };
 
-exports.createCar = async (req, res) => {
-  try {
-    const pool = await poolPromise;
-const result = await pool.request()
-  .input('model', sql.VarChar, model)
-  .input('price', sql.Decimal(18, 2), price)
-  .input('brand_id', sql.Int, brand_id)
-  .input('year', sql.Int, year)
-  .input('image', sql.VarChar, image) // ✅ Add this
-  .input('mileage', sql.Int, mileage)
-  .input('fuel_type', sql.VarChar, fuel_type)
-  .input('transmission', sql.VarChar, transmission)
-  .input('color', sql.VarChar, color)
-  .query(`
-    INSERT INTO Cars (model, price, brand_id, year, image, mileage, fuel_type, transmission, color)
-    VALUES (@model, @price, @brand_id, @year, @image, @mileage, @fuel_type, @transmission, @color)
-  `);
-
-    return res.status(201).json({ message: "Car inserted successfully", data: result });
-  } catch (err) {
-    console.error("Database error:", err);
-    res.status(500).json({ message: "Internal server error", error: err.message });
-  }
-};
 
 exports.getAllBrands = async (req, res) => {
   try {
@@ -70,6 +46,14 @@ exports.getAllInquiries = async (req, res) => {
   }
 };
 
+exports.getAllCarReviews = async (req, res) => {
+  try {
+    const tasks = await Task.getAllCarReviews();
+    res.json(tasks);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
 exports.getAllReviews = async (req, res) => {
   try {
     const tasks = await Task.getAllReviews();
@@ -137,6 +121,17 @@ exports.RegisterUser = async (req, res) => {
   } catch (error) {
     console.error("Controller error in RegisterUser:", error);
     res.status(500).json({ error: 'Internal Server Error', message: error.message });
+  }
+};
+
+exports.createCar = async (req, res) => {
+  try {
+    const { model, price, brand_id, year, image, mileage, fuel_type, transmission, color , body_type } = req.body;
+    const result = await Task.createCar({model, price, brand_id, year, image, mileage, fuel_type, transmission, color , body_type});
+    res.json(result);
+  } catch (error) {
+    console.error('Error in createCar controller:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 };
 
@@ -297,6 +292,57 @@ exports.GetFilteredCars=async(req, res) => {
       res.status(500).json({ error: 'Internal Server Error' });
     }
   }
+  
+  exports.GetUserWishlist= async (req, res) => {
+    try {
+      const { user_id } = req.body;
+      const result = await Task.GetUserWishlist(user_id);
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  }
+
+  exports.addToWishlist = async (req, res) => {
+    try {
+      const { user_id, car_id } = req.body;
+      const result = await Task.addToWishlist(user_id, car_id);
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  }
+
+exports.UpdateUserProfile = async (req, res) => {
+  try {
+    const { user_id,user_fname,user_lname,email,password_hash,address, contact_info } = req.body;
+    const result = await Task.UpdateUserProfile(user_id,user_fname,user_lname,email,password_hash,address, contact_info);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+}
+
+exports.GetUserProfile = async (req, res) => {
+  try {
+    const { user_id } = req.body;
+    const result = await Task.GetUserProfile(user_id);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+} 
+
+exports.GetFilteredCarsAdvanced=async (req, res) => {
+  try {
+    const { brand_id, model,min_price,max_price,fuel_type,transmission,min_mileage,max_mileage,body_type,color,year } = req.body;
+    const result = await Task.GetFilteredCarsAdvanced(brand_id, model,min_price,max_price,fuel_type,transmission,min_mileage,max_mileage,body_type,color,year);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+}
+
  
 
 

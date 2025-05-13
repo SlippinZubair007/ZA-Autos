@@ -10,24 +10,28 @@ import {
     FormControl,
   } from "@chakra-ui/react";
   import { useState } from "react";
-  import { useLoginManager } from "../store/Login"; // replace with actual path
-  
+  import { useLoginManager } from "../store/Login"; 
+  import ImageDisplay from "../components/ui/CollectPage";
+
   const Login = () => {
     const [credentials, setCredentials] = useState({
       email: "",
       password_hash: "",
     });
-  
+    
+    const [user_id, setUserId] = useState(null);
     const [message, setMessage] = useState("");
     const [messageType, setMessageType] = useState("info");
   
-    const { LoginUser } = useLoginManager(); // assume this returns { success, message }
+    const { LoginUser } = useLoginManager(); 
   
-    const handleLogin = async () => {
-      const { success, message } = await LoginUser(credentials);
+    const handleLogin = async () => { 
+
+      const {user_id,success,message } = await LoginUser(credentials);
+      console.log("Login response:", {user_id,success,message}); 
       setMessage(message);
       setMessageType(success ? "success" : "error");
-  
+      
       setTimeout(() => {
         setMessage("");
         setMessageType("info");
@@ -38,22 +42,19 @@ import {
           email: "",
           password_hash: "",
         });
-  
-        // Redirect if needed, e.g.:
-        // navigate("/dashboard");
       }
     };
   
     return (
-      <Container maxW="container.sm">
+      <ImageDisplay>
+      <Container maxW="container.sm" mt="50px">
         <VStack spacing={8}>
-          <Heading as="h1" size="2xl" textAlign="center" mb={8}>
+          <Heading as="h1" size="2xl" textAlign="center" mb={5} fontSize="32px"  fontFamily="'Inter', sans-serif" >
             Log In
           </Heading>
-  
           <Box
             w="full"
-            bg={useColorModeValue("white", "gray.800")}
+            bg={useColorModeValue("white", "black")}
             p={6}
             rounded="lg"
             shadow="md"
@@ -97,6 +98,7 @@ import {
           </Box>
         </VStack>
       </Container>
+      </ImageDisplay>
     );
   };
   

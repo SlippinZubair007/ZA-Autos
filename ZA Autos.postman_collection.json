@@ -289,9 +289,21 @@
 		},
 		{
 			"name": "Users",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
 			"request": {
 				"method": "GET",
 				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
 				"url": {
 					"raw": "http://localhost:5000/api/CarUsers",
 					"protocol": "http",
@@ -332,10 +344,38 @@
 			"response": []
 		},
 		{
+			"name": "GetReviews",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
 			"name": "UserWishlist",
 			"request": {
 				"method": "GET",
 				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "GetUserProfile",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/api/GetUserProfile",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"GetUserProfile"
+					]
+				}
 			},
 			"response": []
 		},
@@ -390,7 +430,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "\r\n{\r\n    \"user_fname\": \"John\" ,\r\n    \"user_lname\": \"Wick\",\r\n    \"email\": \"MrWick@gmail.com\",\r\n    \"contact_info\": \"03044767292\",\r\n    \"dob\":\"2004-07-14\",\r\n    \"address\": \"California USA\",\r\n    \"cnic\": \"3520290219829\",\r\n    \"password_hash\":\"12345678\"\r\n}\r\n",
+					"raw": "{\r\n        \"user_fname\": \"John \",\r\n        \"user_lname\": \"Doe\",\r\n        \"email\": \"amnarehan@gmail.com\",\r\n        \"contact_info\": \"030447677165\",\r\n        \"dob\": \"2025-05-13\",\r\n        \"address\": \"California\",\r\n        \"cnic\": \"1234567891234\",\r\n        \"password_hash\": \"JohnDoe12\"\r\n    }",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -419,7 +459,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"email\":\"detroitzubairkhan@gmail.com\",\r\n  \"password_hash\":\"ZAuto1\"\r\n}",
+					"raw": "{\r\n  \"email\":\"amnarehan@gmail.com\",\r\n  \"password_hash\":\"AmnaUttayHegi\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -697,6 +737,93 @@
 					"path": [
 						"api",
 						"DeleteAccount"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add Car",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5000/api/add",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"add"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetUserWishlist",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"user_id\":\"16\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5000/api/GetUserWishlist",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"GetUserWishlist"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Wish",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"user_id\":\"16\",\r\n    \"car_id\":\"21\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5000/api/CreateWish",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"CreateWish"
 					]
 				}
 			},

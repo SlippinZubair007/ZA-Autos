@@ -7,7 +7,8 @@ import {
   } from '@chakra-ui/react';
   import { IoMdMenu } from "react-icons/io";
   import { Link } from 'react-router-dom';
-  import UserAvatar from './UserAvatar'; 
+  import { PiCarProfileThin } from "react-icons/pi";
+
   const CustomMenu = () => {
     return (
       <Menu>
@@ -36,21 +37,31 @@ import {
     return (
       <Menu>
         <MenuButton as={Button} variant="outline" size="sm" bg="black" color="white">
-        <UserAvatar />
+        <PiCarProfileThin />
         </MenuButton>
         <MenuList>
-          <MenuItem>Name</MenuItem>
-          <MenuItem>Credentials</MenuItem>
+          <Link to="/UpdateProfile">
+          <MenuItem>Profile</MenuItem>
+          </Link>
           <Link to="/Register">
            <MenuItem>Sign Up</MenuItem>
           </Link>
           <Link to="/Login">
           <MenuItem>Login</MenuItem>
           </Link>
+          <Link to ="/review">
+          <MenuItem>Rate</MenuItem>
+          </Link>
+          <Link to="/CreateWish">
+          <MenuItem>Wish</MenuItem>
+          </Link>
+          <Link to ="/Logout">
+          <MenuItem>Logout</MenuItem>
+          </Link>
         </MenuList>
       </Menu>
     );
   };
-    
+  
   export {CustomMenu,ProfileMenu};
   

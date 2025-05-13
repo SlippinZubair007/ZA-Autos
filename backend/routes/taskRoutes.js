@@ -19,25 +19,30 @@ router.get('/TopRated', taskController.TopRatedCars);
 router.get('/UserWishlist', taskController.UserWishlist);
 
 
-router.post('/add',
-  [
-    body('model').notEmpty().withMessage('Model is required'),
-    body('price').isNumeric().withMessage('Price must be a number'),
-    body('brand_id').isInt().withMessage('Brand ID must be an integer'),
-    body('year').isInt({ min: 1886 }).withMessage('Year must be a valid number after 1886'),
-    // Add any additional validation as needed
-  ],
-  (req, res, next) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      console.log("Validation Errors:", errors.array());
-      return res.status(400).json({ errors: errors.array() });
-    }
-    console.log("Validation Passed, Data:", req.body);
-    next();
-  },
-  taskController.createCar  // 👈 YOU NEED TO IMPLEMENT THIS FUNCTION IN YOUR CONTROLLER
-);
+  router.post('/add',
+    [
+      body('model').notEmpty().withMessage('Model is required'),
+      body('price').isNumeric().withMessage('Price must be a number'),
+      body('brand_id').isInt().withMessage('Brand ID must be an integer'),
+      body('year').isInt({ min: 1886 }).withMessage('Year must be a valid number after 1886'),
+      body('image').notEmpty().withMessage('Image URL is required'),
+      body('color').notEmpty().withMessage('Color is required'),
+      body('fuel_type').notEmpty().withMessage('Fuel type is required'),
+      body('mileage').isNumeric().withMessage('Mileage must be a number'),
+      body('transmission').notEmpty().withMessage('Transmission type is required'),
+      body('body_type').notEmpty().withMessage('Body type is required'),
+    ],
+    (req, res, next) => {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        console.log("Validation Errors:", errors.array());
+        return res.status(400).json({ errors: errors.array() });
+      }
+      console.log("Validation Passed, Data:", req.body);
+      next();
+    },
+    taskController.createCar 
+  );
 
 router.post('/Register',
     [
@@ -259,6 +264,104 @@ router.post('/GetRating',
     next();
   },
   taskController.GetCarReviews
+)
+
+router.post('/GetUserWishlist',
+  [
+    body('user_id').notEmpty().withMessage('User ID is required'),
+  ],
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      console.log("Validation Errors:", errors.array());
+      return res.status(400).json({ errors: errors.array() });
+    }
+    console.log("Validation Passed, Data:", req.body);
+    next();
+  },
+  taskController.GetUserWishlist
+)
+
+router.post('/CreateWish',
+  [
+    body('user_id').notEmpty().withMessage('User ID is required'),
+    body('car_id').notEmpty().withMessage('Car ID is required'),
+  ],
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      console.log("Validation Errors:", errors.array());
+      return res.status(400).json({ errors: errors.array() });
+    }
+    console.log("Validation Passed, Data:", req.body);
+    next();
+  },
+  taskController.addToWishlist
+)
+
+router.post('/UpdateProfile',
+  [
+    body('user_id').notEmpty().withMessage('User ID is required'),
+   body('user_fname').notEmpty().withMessage('First Name is required'),
+   body('user_lname').notEmpty().withMessage('Last Name is required'),
+    body('email').isEmail().withMessage('Invalid email format'),
+    body('contact_info').notEmpty().withMessage('Phone is required'),
+    body('password_hash').isLength({ min: 8 }).withMessage('Password should be at least 8 characters'),
+    body('address').optional(),
+    body('contact_info').optional(),
+  ],
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      console.log("Validation Errors:", errors.array());
+      return res.status(400).json({ errors: errors.array() });
+    }
+    console.log("Validation Passed, Data:", req.body);
+    next();
+  },
+  taskController.UpdateUserProfile
+)
+
+router.post('/GetUserProfile',
+  [
+    body('user_id').notEmpty().withMessage('User ID is required'),
+  ],
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      console.log("Validation Errors:", errors.array());
+      return res.status(400).json({ errors: errors.array() });
+    }
+    console.log("Validation Passed, Data:", req.body);
+    next();
+  },
+  taskController.GetUserProfile
+)
+
+router.post('/Filter',
+  [
+   body('brand_id').optional().isInt().withMessage('Brand ID must be an integer'),
+   body('min_price').optional().isNumeric().withMessage('Minimum price must be a number'),
+   body('max_price').optional().isNumeric().withMessage('Maximum price must be a number'), 
+   body('fuel_type').optional().isString().withMessage('Fuel type must be a string'),
+   body('transmission').optional().isString().withMessage('Transmission type must be a string'),
+   body('min_mileage').optional().isNumeric().withMessage('Minimum mileage must be a number'),
+   body('max_mileage').optional().isNumeric().withMessage('Maximum mileage must be a number'),
+   body('body_type').optional().isString().withMessage('Body type must be a string'),
+   body('color').optional().isString().withMessage('Color must be a string'),
+   body('year').optional().isInt({ min: 1886 }).withMessage('Year must be a valid number after 1886'),
+   body('model').optional().isString().withMessage('Model must be a string')
+  ],
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      console.log("Validation Errors:", errors.array());
+      return res.status(400).json({ errors: errors.array() });
+    }
+    console.log("Validation Passed, Data:", req.body);
+    next();
+  },
+  taskController.GetFilteredCarsAdvanced
 )
 
 module.exports = router;

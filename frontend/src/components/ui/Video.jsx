@@ -3,15 +3,15 @@ import { Box } from '@chakra-ui/react';
 const Video = () => { 
   return ( 
     <Box 
-      position="relative"  // Changed from absolute to relative
-      top="10"              // Adjusted positioning
+      position="relative" 
+      top="10"             
       width="100%"
       maxW="1200px"
-      mx="auto"            // Center horizontally
-      mt="20px"            // Add margin top to position below navbar
+      mx="auto"          
+      mt="20px"         
       borderRadius="md" 
       overflow="hidden" 
-      zIndex="1"           // Changed from -1 to 1 to ensure visibility
+      zIndex="1"       
     > 
       <video 
         autoPlay 
